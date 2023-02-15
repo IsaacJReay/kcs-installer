@@ -20,6 +20,8 @@ const Install = () => {
     }]
   });
 
+  const [final, setFinal] = useState(false);
+
   const fetchData = async () => {
     invoke("get_install_status",)
       .then((res) => {
@@ -27,23 +29,28 @@ const Install = () => {
         setData(res1)
       })
       .catch((e) => console.log(e))
-    console.log("getting data");
   }
 
   useEffect(() => {
-    // setInterval(() => {
+    setInterval(() => {
       fetchData();
-    // }, 500)
+    }, 500)
   }, []);
 
-  const arr: statusListItem[] = data.status_list;
-  console.log("data", arr);
+  useEffect(() => {
+    if (data.progress >= 100) {
+      setFinal(true)
+    }
+  })
 
+  const handleClick = () => {
+    invoke("reboot")
+  }
 
   return (
     <div>
       <center>
-        <div className="grid grid-rows-1 grid-flow-col gap-4 justify-center sm:py-10 md:pb-16 md:pt-12 lg:pb-18 lg:pt:16">
+        <div className="grid grid-rows-1 grid-flow-col gap-4 justify-center sm:py-6 md:pt-8 lg:pt:12">
           <div className="row-span-1">
             <img
               className="sm:h-[90px] md:h-[115px] xl:h-[130px] flex items-center justify-center"
@@ -52,9 +59,9 @@ const Install = () => {
           </div>
         </div>
       </center>
-      <div className="relative container flex justify-center sm:px-20 md:px-36 overflow-auto sm:m-h-2/5 md:m-h-96">
+      <div className="relative container flex justify-center sm:px-20 md:px-36 overflow-auto sm:h-44 md:h-52 lg:h-80">
         <div className="grid grid-flow-row-dense grid-cols-10 justify-start w-full">
-          {arr !== undefined && arr.map((each) => {
+          {data.status_list.map((each) => {
             if (each.status === "done") {
               return (
                 <Fragment>
@@ -85,26 +92,40 @@ const Install = () => {
               return (
                 <Fragment>
                   <h1></h1>
-                  <h1 className="col-span-9 text-grey-600 h-8 truncate">
+                  <h1 className="col-span-9 text-slate-600 h-8 truncate">
                     {each.name}
                   </h1>
                 </Fragment>
               )
             }
-          })}          
+          })}
         </div>
       </div>
-      <div className="absolute bottom-0 inset-x-0 sm:pb-10 sm:px-20 md:px-36 md:pb-16" id="progress_bar">
-        <div className="flex justify-between mb-1">
-          <span className="text-base font-medium text-dark-700">Progress</span>
-          <span className="text-sm font-medium text-dark-700">
-            {data.progress}%
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-5 dark:bg-gray-700">
-          <div className="bg-blue-600 h-5 rounded-full" style={{ width: data.progress + "%" }}></div>
-        </div>
-      </div>
+      {!final ?
+        <Fragment>
+          <div className="absolute bottom-0 inset-x-0 sm:pb-4 sm:px-20 md:px-36 md:pb-12" id="progress_bar">
+            <div className="flex justify-between mb-1">
+              <span className="text-base font-medium text-dark-700">Progress</span>
+              <span className="text-sm font-medium text-dark-700">
+                {data.progress}%
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-5 dark:bg-gray-700">
+              <div className="bg-blue-600 h-5 rounded-full" style={{ width: data.progress + "%" }}></div>
+            </div>
+          </div>
+        </Fragment> : <Fragment>
+          <div className="absolute bottom-0 inset-x-0 sm:pb-4 sm:px-20 md:px-36 md:pb-8">
+            <div className="grid grid-rows-1 grid-flow-col gap-4 justify-center sm:pt-20 md:pt-24 lg:pt-30 w-full">
+              <button 
+                onClick={handleClick}
+                className="row-span-1 w-full bg-transparent hover:bg-blue-900 text-blue-900 font-semibold hover:text-white sm:py-1 sm:px-8 md:py-3 md:px-14 md:text-2xl lg:py-8 lg:px-16 border border-blue-900 hover:border-transparent rounded-lg">
+                REBOOT
+              </button>
+            </div>
+          </div>
+        </Fragment>
+      }
     </div>
   );
 };

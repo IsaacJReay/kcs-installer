@@ -1,15 +1,26 @@
-// use super::db;
+use super::{db, get_value_mutex_safe};
+
+#[tauri::command]
+pub async fn start_installation() {
+    tokio::spawn(async move {
+        loop {
+            println!("Got here");
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        }
+    });
+    
+}
+
+#[tauri::command]
+pub fn reboot() {
+
+}
 
 #[tauri::command]
 pub fn get_install_status() -> InstallStatus {
-    InstallStatus::new(
-        10,
-        vec![
-            InstallStatusListItem::new(String::from("Partitioning Data"), String::from("done")),
-            InstallStatusListItem::new(String::from("Installing System"), String::from("working")),
-            InstallStatusListItem::new(String::from("Finalising Jobs"), String::from("pending")),
-        ],
-    )
+    let _a = get_value_mutex_safe("DEFAULT_USERNAME");
+    println!("continued");
+    db::query_status()
 }
 
 #[derive(Clone, serde::Serialize)]
@@ -29,12 +40,19 @@ impl InstallStatus {
 
 #[derive(Clone, serde::Serialize)]
 pub struct InstallStatusListItem {
+    id: u8,
     name: String,
     status: String,
 }
 
 impl InstallStatusListItem {
-    pub fn new(name: String, status: String) -> Self {
-        Self { name, status }
+    pub fn new(id:u8, name: String, status: String) -> Self {
+        Self { id, name, status }
+    }
+    pub fn get_name(&self) -> String {
+        self.name.to_owned()
+    }
+    pub fn get_id(&self) -> u8 {
+        self.id
     }
 }
