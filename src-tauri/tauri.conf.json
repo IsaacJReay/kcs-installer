@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "kcs-installer",
-    "version": "0.1.0"
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -16,7 +16,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "",
+      "copyright": "KOOMPI © 2020 All Rights Reserved.",
       "deb": {
         "depends": []
       },
@@ -28,8 +28,8 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
-      "longDescription": "",
+      "identifier": "org.koompi.koompi-content-server-installer",
+      "longDescription": "Executable for Content Server Installer",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -37,8 +37,8 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
-      "shortDescription": "",
+      "resources": ["./kcs-installer.db", "./settings.toml"],
+      "shortDescription": "Executable for Content Server Installer",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
