@@ -25,6 +25,15 @@ fn get_value_mutex_safe(key: &str) -> String {
     }
 }
 
+fn set_value_mutex_safe(key: &str, value: String) {
+    loop {
+        match CONF_MAP.clone().try_lock() {
+            Ok(mut unlocked) => {unlocked.insert(key.to_string(), value).unwrap(); break},
+            Err(_) => std::thread::sleep(std::time::Duration::from_millis(3)),
+        }
+    }
+}
+
 fn set_init_parameter(conf_location: &str) {
     let settings = config::Config::builder()
         .add_source(config::File::with_name(conf_location))
@@ -110,7 +119,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             handler::get_install_status,
             handler::reboot,
-            handler::start_installation
+            handler::start_installation,
+            handler::get_disks,
+            handler::set_disk_and_ip
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

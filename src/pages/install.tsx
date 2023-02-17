@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
+import HeadLogo from "../components/head_logo";
 import { invoke } from '@tauri-apps/api/tauri'
 
 interface InstallStatus {
@@ -49,16 +50,7 @@ const Install = () => {
 
   return (
     <div>
-      <center>
-        <div className="grid grid-rows-1 grid-flow-col gap-4 justify-center sm:py-6 md:pt-8 lg:pt:12">
-          <div className="row-span-1">
-            <img
-              className="sm:h-[90px] md:h-[115px] xl:h-[130px] flex items-center justify-center"
-              src="/images/koompi-cotent-server-logo.png"
-            />
-          </div>
-        </div>
-      </center>
+      <HeadLogo/>
       <div className="relative container flex justify-center sm:px-20 md:px-36 overflow-auto sm:h-44 md:h-52 lg:h-80">
         <div className="grid grid-flow-row-dense grid-cols-10 justify-start w-full">
           {data.status_list.map((each) => {

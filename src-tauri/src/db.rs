@@ -25,27 +25,13 @@ pub fn create_tables() {
             Value VARCHAR(255)
         ); 
         INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Progress', '0'); 
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Partitioning Drives', 'done'); 
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Installing System', 'working'); 
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending'); 
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Finalising Installation', 'pending');
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Partitioning Drives', 'pending'); 
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Formating Partitions', 'pending'); 
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Installing System', 'pending');
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Setting Up User Profiles', 'pending');
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Performing Post-Installation', 'pending'); 
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Retrieving Data From Master', 'pending'); 
         COMMIT;")
-                // .execute(
-                //     "CREATE TABLE tblStatusVar(Variable VARCHAR(100) PRIMARY KEY, Value VARCHAR(255));", []
-                // )
                 .unwrap();
         }
     }
@@ -60,13 +46,33 @@ pub fn _insert_replace_tbl_status(var: &str, key: &str) {
     .expect("Failed");
 }
 
-pub fn _update_tbl_status(id: u8, var: &str, key: &str) {
+pub fn update_tbl_status(var: &str, key: &str) {
     let db = open_database();
     db.execute(
-        "UPDATE tblStatusVar SET VARIABLE = ?2, VALUE = ?3 WHERE ID = ?1",
-        params![id, var, key],
+        "UPDATE tblStatusVar SET VALUE = ?2 WHERE VARIABLE = ?1",
+        params![var, key],
     )
     .expect("Failed");
+}
+
+pub fn increment_progress(progress_limit: u8) {
+    let connection = open_database();
+    let mut stmt = connection
+        .prepare("SELECT Value FROM tblStatusVar WHERE Variable='Progress';")
+        .unwrap();
+
+    let current_progress = u8::from_str(
+        stmt.query_row([], |line| Ok(line.get::<usize, String>(0).unwrap()))
+            .unwrap()
+            .as_str(),
+    )
+    .unwrap();
+
+    if current_progress < progress_limit {
+        update_tbl_status("Progress", &(current_progress+1).to_string())
+    }
+
+    
 }
 
 pub fn query_status() -> InstallStatus {
