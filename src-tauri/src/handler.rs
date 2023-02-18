@@ -78,7 +78,7 @@ pub async fn start_installation() {
         let system = self::id_system::id_system();
         // let all_disks = self::partitions_mgmt::print_all_disks();
         let selected_disk: String = get_value_mutex_safe("SELECTED_DISK");
-        let selected_content_disk: String = get_value_mutex_safe("SELECTED_DISK");
+        let selected_content_disk: String = get_value_mutex_safe("SELECTED_CONTENT_DISK");
 
         println!(
             "ram: {}\nsystem: {}\ncontent_disk: {}\nselected_disk: {}",
@@ -130,7 +130,7 @@ pub async fn start_installation() {
 
         manage_status(
             "Installing System",
-            2000,
+            2500,
             &mut install_system_process,
             "35",
             89,
@@ -149,6 +149,8 @@ pub async fn start_installation() {
         self::post_install::prepare_source(&system, &selected_disk);
 
         self::post_install::post_installation().await;
+
+        db::update_tbl_status("Progress", "100");
     });
 }
 

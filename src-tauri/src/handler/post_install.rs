@@ -1,4 +1,4 @@
-use super::{db, get_value_mutex_safe, manage_status, Command};
+use super::{get_value_mutex_safe, manage_status, Command};
 use std::{
     fs::{read_to_string, File, OpenOptions},
     io::Write,
@@ -43,6 +43,24 @@ pub async fn post_installation() {
         .output()
         .unwrap();
 
+    let mut setting_up_profile = Command::new("tar")
+        .arg("-xzvpf")
+        .arg("/root/kcs-conf-amd64.tar.gz")
+        .arg("-C")
+        .arg("/mnt")
+        .spawn()
+        .unwrap();
+
+        manage_status(
+            "Setting Up User Profiles",
+            1500,
+            &mut setting_up_profile,
+            "90",
+            92,
+            true,
+        )
+        .await;
+
     let mut post_install_process = Command::new("arch-chroot")
         .arg("/mnt")
         .arg("/installerpart2.sh")
@@ -53,11 +71,9 @@ pub async fn post_installation() {
         "Performing Post-Installation",
         1000,
         &mut post_install_process,
-        "90",
+        "92",
         100,
         true,
     )
     .await;
-
-    db::update_tbl_status("Progress", "100");
 }
