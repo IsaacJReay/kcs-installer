@@ -28,7 +28,10 @@ fn get_value_mutex_safe(key: &str) -> String {
 fn set_value_mutex_safe(key: &str, value: String) {
     loop {
         match CONF_MAP.clone().try_lock() {
-            Ok(mut unlocked) => {unlocked.insert(key.to_string(), value).unwrap(); break},
+            Ok(mut unlocked) => {
+                unlocked.insert(key.to_string(), value);
+                break;
+            }
             Err(_) => std::thread::sleep(std::time::Duration::from_millis(3)),
         }
     }

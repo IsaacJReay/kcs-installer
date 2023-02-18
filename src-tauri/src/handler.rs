@@ -6,7 +6,6 @@ mod sys_info;
 use super::{db, get_value_mutex_safe, set_value_mutex_safe};
 use std::process::{Child, Command, Stdio};
 
-
 #[derive(Clone, serde::Serialize)]
 pub struct InstallStatus {
     progress: u8,
@@ -49,17 +48,15 @@ pub struct DisksInfo {
 
 impl DisksInfo {
     pub fn new(name: String, info: String) -> Self {
-        Self {
-            name, info
-        }
+        Self { name, info }
     }
 }
 
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, serde::Deserialize)]
 pub struct DiskandIPArgs {
     selected_disk: String,
     selected_content_disk: String,
-    master_ip: String
+    master_ip: String,
 }
 
 impl DiskandIPArgs {
@@ -79,9 +76,9 @@ pub async fn start_installation() {
     tokio::spawn(async move {
         let findram = self::sys_info::findram(None);
         let system = self::id_system::id_system();
-        let all_disks = self::partitions_mgmt::print_all_disks();
-        let selected_disk: &str = all_disks[0].as_ref();
-        let selected_content_disk: &str = all_disks[1].as_ref();
+        // let all_disks = self::partitions_mgmt::print_all_disks();
+        let selected_disk: String = get_value_mutex_safe("SELECTED_DISK");
+        let selected_content_disk: String = get_value_mutex_safe("SELECTED_DISK");
 
         println!(
             "ram: {}\nsystem: {}\ncontent_disk: {}\nselected_disk: {}",
@@ -95,15 +92,15 @@ pub async fn start_installation() {
         };
 
         self::partitions_mgmt::parted_partitioning(
-            selected_disk,
+            &selected_disk,
             format_label,
             &findram,
             boot_label,
-            selected_content_disk
+            &selected_content_disk,
         )
         .await;
 
-        let all_parts = self::partitions_mgmt::print_all_parts(selected_disk);
+        let all_parts = self::partitions_mgmt::print_all_parts(&selected_disk);
 
         let selected_boot = &all_parts[0];
         let selected_swap = &all_parts[1];
@@ -114,7 +111,7 @@ pub async fn start_installation() {
             selected_swap,
             selected_root,
             format_label,
-            selected_content_disk
+            &selected_content_disk,
         )
         .await;
 
@@ -144,12 +141,12 @@ pub async fn start_installation() {
         self::partitions_mgmt::mount_boot_swap_contentdisk(
             &system,
             &selected_swap,
-            selected_content_disk,
-            Some(selected_disk),
+            &selected_content_disk,
+            Some(&selected_disk),
             &selected_boot,
         );
 
-        self::post_install::prepare_source(&system, selected_disk);
+        self::post_install::prepare_source(&system, &selected_disk);
 
         self::post_install::post_installation().await;
     });
@@ -164,12 +161,14 @@ pub fn reboot() {
 pub fn get_disks() -> Vec<DisksInfo> {
     let all_disks = self::partitions_mgmt::print_all_disks();
 
-    all_disks.iter().map(|each| {
-        let name = each.to_owned();
-        let info = format!("{} {}", &name, &self::sys_info::get_disk_info(&each));
-        DisksInfo::new(name, info)
-    }).collect::<Vec<DisksInfo>>()
-    
+    all_disks
+        .iter()
+        .map(|each| {
+            let name = each.to_owned();
+            let info = format!("{} {}", &name, &self::sys_info::get_disk_info(&each));
+            DisksInfo::new(name, info)
+        })
+        .collect::<Vec<DisksInfo>>()
 }
 
 #[tauri::command]
@@ -178,8 +177,27 @@ pub fn set_disk_and_ip(args: DiskandIPArgs) {
     set_value_mutex_safe("SELECTED_CONTENT_DISK", args.get_selected_content_disk());
     set_value_mutex_safe("MASTER_IP", args.get_master_ip());
 
-    println!("{}\n{}\n{}", get_value_mutex_safe("SELECTED_DISK"), get_value_mutex_safe("SELECTED_CONTENT_DISK"), get_value_mutex_safe("MASTER_IP"))
+    println!(
+        "{}\n{}\n{}",
+        get_value_mutex_safe("SELECTED_DISK"),
+        get_value_mutex_safe("SELECTED_CONTENT_DISK"),
+        get_value_mutex_safe("MASTER_IP")
+    )
 }
+
+// #[tauri::command]
+// pub fn set_disk_and_ip(selected_disk: String, selected_content_disk: String, master_ip: String) {
+//     set_value_mutex_safe("SELECTED_DISK", selected_disk);
+//     set_value_mutex_safe("SELECTED_CONTENT_DISK", selected_content_disk);
+//     set_value_mutex_safe("MASTER_IP", master_ip);
+
+//     println!(
+//         "{}\n{}\n{}",
+//         get_value_mutex_safe("SELECTED_DISK"),
+//         get_value_mutex_safe("SELECTED_CONTENT_DISK"),
+//         get_value_mutex_safe("MASTER_IP")
+//     )
+// }
 
 #[tauri::command]
 pub fn get_install_status() -> InstallStatus {

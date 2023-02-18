@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import "./App.css";
 import Router from "./router";
 
 function App() {
@@ -10,4 +10,4 @@ function App() {
     </div>
   );
 }
-export default App
+export default App;

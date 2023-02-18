@@ -98,7 +98,7 @@ pub async fn mkfs_formating(
     selected_swap: &str,
     selected_root: &str,
     format_label: &str,
-    selected_content_disk: &str
+    selected_content_disk: &str,
 ) {
     let mut make_boot = if format_label == "msdos" {
         Command::new("mkfs.ext4")
@@ -177,7 +177,7 @@ pub fn mount_boot_swap_contentdisk(
         .output()
         .unwrap();
 
-        std::fs::create_dir("/mnt/kmp").unwrap_or(());
+    std::fs::create_dir("/mnt/kmp").unwrap_or(());
 
     Command::new("mount")
         .arg(format!("{}1", selected_content_disk))

@@ -69,10 +69,8 @@ pub fn increment_progress(progress_limit: u8) {
     .unwrap();
 
     if current_progress < progress_limit {
-        update_tbl_status("Progress", &(current_progress+1).to_string())
+        update_tbl_status("Progress", &(current_progress + 1).to_string())
     }
-
-    
 }
 
 pub fn query_status() -> InstallStatus {
