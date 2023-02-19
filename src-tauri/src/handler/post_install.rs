@@ -51,15 +51,14 @@ pub async fn post_installation() {
         .spawn()
         .unwrap();
 
-        manage_status(
-            "Setting Up User Profiles",
-            1500,
-            &mut setting_up_profile,
-            "90",
-            92,
-            true,
-        )
-        .await;
+    manage_status(
+        "Setting Up User Profiles",
+        1500,
+        &mut setting_up_profile,
+        47,
+        true,
+    )
+    .await;
 
     let mut post_install_process = Command::new("arch-chroot")
         .arg("/mnt")
@@ -71,9 +70,20 @@ pub async fn post_installation() {
         "Performing Post-Installation",
         1000,
         &mut post_install_process,
-        "92",
-        100,
+        49,
         true,
     )
     .await;
+
+    // Cleanup install trash
+    Command::new("rm")
+        .arg("-f")
+        .arg("/mnt/selected_disk")
+        .arg("/mnt/system")
+        .arg("/mnt/installerpart2.sh")
+        .arg("/mnt/etc/systemd/network/20-ethernet.network")
+        .arg("/mnt/etc/systemd/network/20-wlan.network")
+        .arg("/mnt/etc/systemd/network/20-wwan.network")
+        .output()
+        .unwrap();
 }

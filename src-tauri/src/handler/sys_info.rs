@@ -1,4 +1,4 @@
-use super::Command;
+use super::{Command, DisksInfo, partitions_mgmt, sys_info};
 use byte_unit::{Byte, ByteUnit};
 use std::str::FromStr;
 use sysinfo::{System, SystemExt};
@@ -29,8 +29,7 @@ pub fn findram(conversion_unit: Option<ByteUnit>) -> String {
 
 pub fn get_disk_info(disk_name: &str) -> String {
     let mut output = String::from_utf8(
-        Command::new("sudo")
-            .arg("blockdev")
+        Command::new("blockdev")
             .arg("--getsize64")
             .arg(disk_name)
             .output()
@@ -38,19 +37,24 @@ pub fn get_disk_info(disk_name: &str) -> String {
             .stdout,
     )
     .unwrap();
-    // let mut output = String::from_utf8(
-    //     Command::new("blockdev")
-    //         .arg("--getsize64")
-    //         .arg(disk_name)
-    //         .output()
-    //         .unwrap()
-    //         .stdout,
-    // )
-    // .unwrap();
     output.pop();
 
     let byte_u128 = u128::from_str(&output).unwrap();
     let byte_obj = Byte::from_bytes(byte_u128);
     let byte_obj_converted = byte_obj.get_adjusted_unit(ByteUnit::GB);
     byte_obj_converted.to_string()
+}
+
+#[tauri::command]
+pub fn get_disks() -> Vec<DisksInfo> {
+    let all_disks = partitions_mgmt::print_all_disks();
+
+    all_disks
+        .iter()
+        .map(|each| {
+            let name = each.to_owned();
+            let info = format!("{} {}", &name, &sys_info::get_disk_info(&each));
+            DisksInfo::new(name, info)
+        })
+        .collect::<Vec<DisksInfo>>()
 }

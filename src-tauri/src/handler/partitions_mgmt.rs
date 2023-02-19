@@ -32,7 +32,7 @@ pub async fn parted_partitioning(
         .spawn()
         .expect("failed to execute process");
 
-    manage_status("Partitioning Drives", 500, &mut part_label, "20", 22, false).await;
+    manage_status("Partitioning Drives", 500, &mut part_label, 2, false).await;
 
     Command::new("parted")
         .arg(selected_content_disk)
@@ -64,7 +64,7 @@ pub async fn parted_partitioning(
         .spawn()
         .expect("failed to execute process");
 
-    manage_status("Partitioning Drives", 500, &mut part_boot, "22", 24, false).await;
+    manage_status("Partitioning Drives", 500, &mut part_boot, 4, false).await;
 
     let mut part_swap = Command::new("parted")
         .arg(selected_disk)
@@ -77,7 +77,7 @@ pub async fn parted_partitioning(
         .spawn()
         .expect("failed to execute process");
 
-    manage_status("Partitioning Drives", 500, &mut part_swap, "24", 26, false).await;
+    manage_status("Partitioning Drives", 500, &mut part_swap, 6, false).await;
 
     let mut part_root = Command::new("parted")
         .arg(selected_disk)
@@ -90,7 +90,7 @@ pub async fn parted_partitioning(
         .spawn()
         .expect("failed to execute process");
 
-    manage_status("Partitioning Drives", 500, &mut part_root, "26", 28, true).await;
+    manage_status("Partitioning Drives", 500, &mut part_root, 8, true).await;
 }
 
 pub async fn mkfs_formating(
@@ -114,7 +114,7 @@ pub async fn mkfs_formating(
             .expect("failed to execute process")
     };
 
-    manage_status("Formating Partitions", 500, &mut make_boot, "30", 31, false).await;
+    manage_status("Formating Partitions", 500, &mut make_boot, 10, false).await;
 
     Command::new("mkfs.ext4")
         .arg("-F")
@@ -127,7 +127,7 @@ pub async fn mkfs_formating(
         .spawn()
         .expect("failed to execute process");
 
-    manage_status("Formating Partitions", 500, &mut make_swap, "31", 33, false).await;
+    manage_status("Formating Partitions", 500, &mut make_swap, 12, false).await;
 
     let mut make_root = Command::new("mkfs.ext4")
         .arg("-F")
@@ -135,7 +135,7 @@ pub async fn mkfs_formating(
         .spawn()
         .expect("failed to execute process");
 
-    manage_status("Formating Partitions", 500, &mut make_root, "33", 35, true).await;
+    manage_status("Formating Partitions", 500, &mut make_root, 14, true).await;
 }
 
 pub fn mount_boot_swap_contentdisk(

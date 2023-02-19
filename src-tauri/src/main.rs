@@ -51,12 +51,6 @@ fn set_init_parameter(conf_location: &str) {
         })
 }
 
-// fn set_init_parameter(conf: HashMap<String, String>) {
-//     conf.into_iter().for_each(|(key, value)| {
-//         CONF_MAP.lock().unwrap().insert(key, value);
-//     })
-// }
-
 // Configuration Arguments Executable for Content Server Installer
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -65,52 +59,6 @@ struct Args {
     #[arg(short, long, default_value_t = String::from("./settings.toml"))]
     config_file: String,
 }
-
-// // Configuration Arguments Executable for Content Server Installer
-// #[derive(Parser, Debug)]
-// #[command(author, version, about, long_about = None)]
-// struct Args {
-//     /// Location of the Database. Can be full or relative path
-//     #[arg(short, long, default_value_t = String::from("./kcs-installer.db"))]
-//     database: String,
-
-//     /// Default Username of new KOOMPI Content Server admin
-//     #[arg(short, long, default_value_t = String::from("admin"))]
-//     default_username: String,
-
-//     /// Default Password of new KOOMPI Content Server admin
-//     #[arg(short, long, default_value_t = String::from("123"))]
-//     default_password: String,
-
-//     /// Multicast ID of KOOMPI Content Server master device to search for
-//     #[arg(short, long, default_value_t = String::from("koompi-content-master"))]
-//     master_multicast_id: String,
-
-//     /// Username of KOOMPI Content Server Master
-//     #[arg(short, long, default_value_t = String::from("root"))]
-//     master_username: String,
-
-//     /// Password of KOOMPI Content Server Master
-//     #[arg(short, long, default_value_t = String::from("123"))]
-//     master_password: String,
-// }
-
-// impl Args {
-//     pub fn create_hash_map(self) -> HashMap<String, String> {
-//         let mut map: HashMap<String, String> = HashMap::new();
-//         map.insert(String::from("DATABASE"), self.database);
-//         map.insert(String::from("DEFAULT_USERNAME"), self.default_username);
-//         map.insert(String::from("DEFAULT_PASSWORD"), self.default_password);
-//         map.insert(
-//             String::from("MASTER_MULTICAST_ID"),
-//             self.master_multicast_id,
-//         );
-//         map.insert(String::from("MASTER_USERNAME"), self.master_username);
-//         map.insert(String::from("MASTER_PASSWORD"), self.master_password);
-
-//         map
-//     }
-// }
 
 fn main() {
     let args = Args::parse();
@@ -122,9 +70,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             handler::get_install_status,
             handler::reboot,
-            handler::start_installation,
-            handler::get_disks,
-            handler::set_disk_and_ip
+            handler::set_disk_and_ip,
+            handler::sys_config::start_installation,
+            handler::sys_info::get_disks,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

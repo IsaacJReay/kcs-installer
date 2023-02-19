@@ -35,11 +35,6 @@ const Input = () => {
     setContentStorage(event.target.value);
   };
 
-  const [IPAddr, setIPAddr] = useState(default_value);
-  const handleIPAddrChange = (event: EventTargetInt) => {
-    setIPAddr(event.target.value);
-  };
-
   const [MainStorageMissing, setMainStorageMissing] = useState(false);
   const [ContentStorageMissing, setContentStorageMissing] = useState(false);
   const [IPAddrMissing, setIPAddrMissing] = useState(false);
@@ -67,14 +62,11 @@ const Input = () => {
       setMainStorageMissing(true);
     } else if (ContentStorage === default_value) {
       setContentStorageMissing(true);
-    } else if (IPAddr === default_value) {
-      setIPAddrMissing(true);
     } else {
       invoke("set_disk_and_ip", {
         args: {
           selected_disk: MainStorage,
           selected_content_disk: ContentStorage,
-          master_ip: IPAddr,
         },
       });
       invoke("start_installation");
@@ -105,7 +97,7 @@ const Input = () => {
                   className="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   id="grid-state"
                 >
-                  <option value="">HardDisk 0</option>
+                  <option value="">Select Storage</option>
                   {data.map((option_data) => {
                     return (
                       <option value={option_data.name}>
@@ -146,7 +138,7 @@ const Input = () => {
                   className="block appearance-none w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                   id="grid-state"
                 >
-                  <option value="">HardDisk 0</option>
+                  <option value="">Select Storage</option>
                   {data.map((option_data) => {
                     return (
                       <option value={option_data.name}>
@@ -168,29 +160,6 @@ const Input = () => {
               {ContentStorageMissing && (
                 <p className="text-red-600 text-xs italic">
                   Content Storage hasn't been set yet
-                </p>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-wrap -mx-3 mb-6">
-            <div className="w-full px-3">
-              <label
-                className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                htmlFor="grid-ip"
-              >
-                Master IP Address
-              </label>
-              <input
-                value={IPAddr}
-                onChange={handleIPAddrChange}
-                className="appearance-none block w-full bg-gray-100 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="grid-password"
-                type="text"
-                placeholder="192.168.1.1"
-              />
-              {IPAddrMissing && (
-                <p className="text-red-600 text-xs italic">
-                  Master IP Address hasn't been set yet
                 </p>
               )}
             </div>
