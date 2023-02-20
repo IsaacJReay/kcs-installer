@@ -53,7 +53,7 @@ const Install = () => {
   return (
     <div>
       <HeadLogo />
-      <div className="relative container flex justify-center sm:px-20 md:px-36 overflow-auto sm:h-44 md:h-52 lg:h-80">
+      <div className="relative container flex justify-center sm:pt-1 md:pt-2 lg:pt-6 sm:px-20 md:px-36 sm:h-44 md:h-52 lg:h-64 overflow-auto">
         <div className="grid grid-flow-row-dense grid-cols-10 justify-start w-full">
           {data.status_list.map((each) => {
             if (each.status === "done") {

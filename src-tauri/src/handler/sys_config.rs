@@ -1,4 +1,4 @@
-use super::{db, sys_info, id_system, get_value_mutex_safe, partitions_mgmt, post_install, Command, manage_status};
+use super::{sys_info, id_system, get_value_mutex_safe, partitions_mgmt, post_install, Command, manage_status, download_data};
 
 #[tauri::command]
 pub async fn start_installation() {
@@ -8,10 +8,9 @@ pub async fn start_installation() {
         let selected_disk: String = get_value_mutex_safe("SELECTED_DISK");
         let selected_content_disk: String = get_value_mutex_safe("SELECTED_CONTENT_DISK");
 
-        let (format_label, boot_label) = if system == "UEFI" {
-            ("gpt", "fat32")
-        } else {
-            ("msdos", "ext4")
+        let (format_label, boot_label) = match system == "UEFI" {
+            true => ("gpt", "fat32"),
+            false => ("msdos", "ext4")
         };
 
         partitions_mgmt::parted_partitioning(
@@ -55,10 +54,9 @@ pub async fn start_installation() {
         );
 
         self::post_install::prepare_source(&system, &selected_disk);
-
         self::post_install::post_installation().await;
+        self::download_data::download_data().await;
 
-        db::update_tbl_status("Progress", "100");
     });
 }
 

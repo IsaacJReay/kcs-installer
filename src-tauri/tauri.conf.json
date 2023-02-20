@@ -55,7 +55,7 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 625,
         "resizable": true,
         "title": "KOOMPI Content Server Installer",
         "width": 800

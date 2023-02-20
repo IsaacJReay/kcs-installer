@@ -68,7 +68,7 @@ pub fn increment_progress(progress_limit: u8) {
     )
     .unwrap();
 
-    if current_progress < progress_limit {
+    if current_progress < progress_limit-1 {
         update_tbl_status("Progress", &(current_progress + 1).to_string())
     }
 }
