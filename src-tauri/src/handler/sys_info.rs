@@ -1,4 +1,4 @@
-use super::{Command, DisksInfo, partitions_mgmt, sys_info};
+use super::{partitions_mgmt, sys_info, Command, DisksInfo};
 use byte_unit::{Byte, ByteUnit};
 use std::str::FromStr;
 use sysinfo::{System, SystemExt};
@@ -28,8 +28,18 @@ pub fn findram(conversion_unit: Option<ByteUnit>) -> String {
 }
 
 pub fn get_disk_info(disk_name: &str) -> String {
+    // let mut output = String::from_utf8(
+    //     Command::new("blockdev")
+    //         .arg("--getsize64")
+    //         .arg(disk_name)
+    //         .output()
+    //         .unwrap()
+    //         .stdout,
+    // )
+    // .unwrap();
     let mut output = String::from_utf8(
-        Command::new("blockdev")
+        Command::new("sudo")
+            .arg("blockdev")
             .arg("--getsize64")
             .arg(disk_name)
             .output()

@@ -22,11 +22,10 @@
       },
       "externalBin": [],
       "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
+        "png/onelab-squre.png",
+        "png/onelab-32x32.png",
+        "png/onelab-128x128.png",
+        "png/onelab.ico"
       ],
       "identifier": "org.koompi.koompi-content-server-installer",
       "longDescription": "Executable for Content Server Installer",
