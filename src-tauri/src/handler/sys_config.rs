@@ -1,8 +1,12 @@
-use super::{sys_info, id_system, get_value_mutex_safe, partitions_mgmt, post_install, Command, manage_status, download_data};
+use super::{
+    download_data, get_value_mutex_safe, id_system, manage_status, partitions_mgmt, post_install,
+    sys_info, Command,
+};
 
 #[tauri::command]
 pub async fn start_installation() {
     tokio::spawn(async move {
+        disable_sleep(true);
         let findram = sys_info::findram(None);
         let system = id_system::id_system();
         let selected_disk: String = get_value_mutex_safe("SELECTED_DISK");
@@ -10,7 +14,7 @@ pub async fn start_installation() {
 
         let (format_label, boot_label) = match system == "UEFI" {
             true => ("gpt", "fat32"),
-            false => ("msdos", "ext4")
+            false => ("msdos", "ext4"),
         };
 
         partitions_mgmt::parted_partitioning(
@@ -53,27 +57,44 @@ pub async fn start_installation() {
             &selected_boot,
         );
 
+        self::partitions_mgmt::prepare_boot();
         self::post_install::prepare_source(&system, &selected_disk);
         self::post_install::post_installation().await;
         self::download_data::download_data().await;
-
     });
 }
 
 async fn install_system() {
     let mut install_system_process = Command::new("cp")
-            .arg("-ax")
-            .arg("/run/archiso/airootfs/.")
-            .arg("/mnt/")
-            .spawn()
-            .unwrap();
+        .arg("-avx")
+        .arg("/run/archiso/airootfs/.")
+        .arg("/mnt/")
+        .spawn()
+        .unwrap();
 
-        manage_status(
-            "Installing System",
-            2500,
-            &mut install_system_process,
-            45,
-            true,
-        )
-        .await;
+    manage_status(
+        "Installing System",
+        2500,
+        &mut install_system_process,
+        45,
+        true,
+    )
+    .await;
+}
+
+pub fn disable_sleep(state: bool) {
+    Command::new("systemctl")
+        .arg(match state {
+            true => "mask",
+            false => "unmask"
+        })
+        .args(&[
+            "sleep.target",
+            "suspend.target",
+            "suspend-then-hibernate.target",
+            "hibernate.target",
+            "hybrid-sleep.target",
+        ])
+        .output()
+        .unwrap();
 }

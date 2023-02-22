@@ -6,14 +6,14 @@ pub async fn download_data() {
         .arg(get_value_mutex_safe("MASTER_PASSWORD"))
         .arg("rsync")
         .arg("-e")
-        .arg("ssh -o 'StrictHostKeyChecking no'")
+        .arg("ssh -o 'StrictHostKeyChecking no' -o 'ServerAliveInterval=60'")
         .arg("-avP")
         .arg(format!(
             "{}@{}:/kmp/",
             get_value_mutex_safe("MASTER_USERNAME"),
             get_value_mutex_safe("MASTER_MULTICAST_ID")
         ))
-        .arg("/kmp")
+        .arg("/mnt/kmp")
         .spawn()
         .unwrap();
 

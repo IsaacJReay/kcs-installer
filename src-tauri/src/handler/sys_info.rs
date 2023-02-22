@@ -28,18 +28,8 @@ pub fn findram(conversion_unit: Option<ByteUnit>) -> String {
 }
 
 pub fn get_disk_info(disk_name: &str) -> String {
-    // let mut output = String::from_utf8(
-    //     Command::new("blockdev")
-    //         .arg("--getsize64")
-    //         .arg(disk_name)
-    //         .output()
-    //         .unwrap()
-    //         .stdout,
-    // )
-    // .unwrap();
     let mut output = String::from_utf8(
-        Command::new("sudo")
-            .arg("blockdev")
+        Command::new("blockdev")
             .arg("--getsize64")
             .arg(disk_name)
             .output()
@@ -47,6 +37,16 @@ pub fn get_disk_info(disk_name: &str) -> String {
             .stdout,
     )
     .unwrap();
+    // let mut output = String::from_utf8(
+    //     Command::new("sudo")
+    //         .arg("blockdev")
+    //         .arg("--getsize64")
+    //         .arg(disk_name)
+    //         .output()
+    //         .unwrap()
+    //         .stdout,
+    // )
+    // .unwrap();
     output.pop();
 
     let byte_u128 = u128::from_str(&output).unwrap();

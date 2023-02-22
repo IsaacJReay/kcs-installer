@@ -71,6 +71,7 @@ impl DiskandIPArgs {
 
 #[tauri::command]
 pub fn reboot() {
+    self::sys_config::disable_sleep(false);
     Command::new("reboot").output().unwrap();
 }
 

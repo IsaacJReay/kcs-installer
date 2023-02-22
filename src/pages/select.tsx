@@ -69,7 +69,9 @@ const Input = () => {
           selected_content_disk: ContentStorage,
         },
       });
-      invoke("start_installation");
+      if (import.meta.env.PROD) {
+        invoke("start_installation");
+      }
       window.eval("window.location.replace('/install')");
     }
   };
@@ -164,7 +166,7 @@ const Input = () => {
               )}
             </div>
           </div>
-          <div className="flex flex-wrap -mx-3 mb-6">
+          <div className="flex flex-wrap -mx-3 mb-6 sm:pt-4 md:pt-10 xl:pt-56">
             <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
               <Link to="/">
                 <button className="appearance-none block w-full bg-red-600 text-white border border border-slate-300 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:border-slate-600 focus:bg-red-300">

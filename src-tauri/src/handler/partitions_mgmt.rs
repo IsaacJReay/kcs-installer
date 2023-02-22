@@ -170,13 +170,6 @@ pub fn mount_boot_swap_contentdisk(
             .unwrap();
     }
 
-    Command::new("cp")
-        .arg("-aT")
-        .arg("/run/archiso/bootmnt/kcs/boot/x86_64/vmlinuz-linux")
-        .arg("/mnt/boot/vmlinuz-linux")
-        .output()
-        .unwrap();
-
     std::fs::create_dir("/mnt/kmp").unwrap_or(());
 
     Command::new("mount")
@@ -186,4 +179,15 @@ pub fn mount_boot_swap_contentdisk(
         .unwrap();
 
     Command::new("swapon").arg(selected_swap).output().unwrap();
+}
+
+pub fn prepare_boot() {
+    Command::new("cp")
+        .arg("-p")
+        .arg("/run/archiso/bootmnt/kcs/boot/x86_64/vmlinuz-linux")
+        .arg("/run/archiso/bootmnt/kcs/boot/amd-ucode.img")
+        .arg("/run/archiso/bootmnt/kcs/boot/intel-ucode.img")
+        .arg("/mnt/boot/")
+        .output()
+        .unwrap();
 }
