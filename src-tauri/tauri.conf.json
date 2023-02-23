@@ -36,7 +36,7 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": ["./kcs-installer.db", "./settings.toml"],
+      "resources": ["./settings.toml"],
       "shortDescription": "Executable for Content Server Installer",
       "targets": "all",
       "windows": {

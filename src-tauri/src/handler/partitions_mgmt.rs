@@ -182,12 +182,17 @@ pub fn mount_boot_swap_contentdisk(
 }
 
 pub fn prepare_boot() {
-    Command::new("cp")
-        .arg("-p")
-        .arg("/run/archiso/bootmnt/kcs/boot/x86_64/vmlinuz-linux")
-        .arg("/run/archiso/bootmnt/kcs/boot/amd-ucode.img")
-        .arg("/run/archiso/bootmnt/kcs/boot/intel-ucode.img")
-        .arg("/mnt/boot/")
+    let paths = std::fs::read_dir("/root/packages").unwrap();
+
+    let file_list = paths
+        .into_iter()
+        .map(|each| each.as_ref().unwrap().path().to_str().unwrap().to_string())
+        .collect::<Vec<String>>();
+
+    Command::new("pacstrap")
+        .arg("-U")
+        .arg("/mnt")
+        .args(&file_list)
         .output()
         .unwrap();
 }
