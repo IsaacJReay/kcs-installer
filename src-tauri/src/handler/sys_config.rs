@@ -66,7 +66,7 @@ pub async fn start_installation() {
 
 async fn install_system() {
     let mut install_system_process = Command::new("cp")
-        .arg("-avx")
+        .arg("-ax")
         .arg("/run/archiso/airootfs/.")
         .arg("/mnt/")
         .spawn()

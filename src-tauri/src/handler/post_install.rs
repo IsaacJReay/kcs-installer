@@ -44,7 +44,7 @@ pub async fn post_installation() {
         .unwrap();
 
     let mut setting_up_profile = Command::new("tar")
-        .arg("-xzvpf")
+        .arg("-xzpf")
         .arg("/root/kcs-conf-amd64.tar.gz")
         .arg("-C")
         .arg("/mnt")
