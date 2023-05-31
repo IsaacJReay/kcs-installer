@@ -5,7 +5,7 @@ pub async fn copy_data() {
     if !selected_data_disk.is_empty() {
         Command::new("mount")
             .arg(selected_data_disk)
-            .arg("/mnt")
+            .arg("/mnt/mnt")
             .output()
             .unwrap();
 
@@ -13,10 +13,38 @@ pub async fn copy_data() {
             .arg("rsync")
             .arg("-e")
             .arg("-avPW")
-            .arg("/mnt")
-            .arg("/kmp")
+            .arg("/mnt/mnt/")
+            .arg("/mnt/kmp")
             .spawn()
             .unwrap();
+
+        Command::new("rsync")
+            .arg("-avP")
+            .arg("/mnt/kmp/services/")
+            .arg("/mnt/etc/systemd/system/")
+            .output()
+            .unwrap();
+
+        Command::new("rsync")
+            .arg("-avP")
+            .arg("/mnt/kmp/bind/conf/")
+            .arg("/mnt/etc")
+            .output()
+            .unwrap();
+
+        Command::new("rsync")
+            .arg("-avP")
+            .arg("/mnt/kmp/bind/zones/")
+            .arg("/mnt/var/named")
+            .output()
+            .unwrap();
+
+        Command::new("chown")
+            .arg("root:named")
+            .arg("/var/named/")
+            .arg("-R")
+            .output()
+            .unwrap();  
 
         manage_status(
             "Copy Data From External",
