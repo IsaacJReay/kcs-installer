@@ -19,7 +19,11 @@ static CONF_MAP: Lazy<Arc<Mutex<HashMap<String, String>>>> =
 fn get_value_mutex_safe(key: &str) -> String {
     loop {
         match CONF_MAP.clone().try_lock() {
-            Ok(unlocked) => break unlocked.get(key).unwrap().to_owned(),
+            Ok(unlocked) => break match unlocked.get(key){
+                Some(data) => data.to_owned(),
+                None => String::new()
+
+            },
             Err(_) => std::thread::sleep(std::time::Duration::from_millis(3)),
         }
     }
@@ -70,7 +74,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             handler::get_install_status,
             handler::reboot,
-            handler::set_disk_and_ip,
+            handler::set_main_disks,
+            handler::set_data_disks,
             handler::sys_config::start_installation,
             handler::sys_info::get_disks,
         ])

@@ -29,8 +29,8 @@ pub fn create_tables() {
         INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Formating Partitions', 'pending'); 
         INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Installing System', 'pending');
         INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Setting Up User Profiles', 'pending');
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Performing Post-Installation', 'pending'); 
-        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Retrieving Data From Master', 'pending'); 
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Performing Post-Installation', 'pending');
+        INSERT OR REPLACE INTO tblStatusVar(Variable, Value) VALUES('Copy Data From External', 'pending'); 
         COMMIT;")
                 .unwrap();
         }

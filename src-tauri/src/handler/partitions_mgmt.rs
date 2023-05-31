@@ -22,7 +22,7 @@ pub async fn parted_partitioning(
     format_label: &str,
     findram: &str,
     boot_label: &str,
-    selected_content_disk: &str,
+    selected_content_disk: &Option<&str>,
 ) {
     let mut part_label = Command::new("parted")
         .arg(selected_disk)
@@ -34,24 +34,26 @@ pub async fn parted_partitioning(
 
     manage_status("Partitioning Drives", 500, &mut part_label, 2, false).await;
 
-    Command::new("parted")
-        .arg(selected_content_disk)
-        .arg("mklabel")
-        .arg(format_label)
-        .arg("--script")
-        .output()
-        .expect("failed to execute process");
+    if let Some(selected_content_disk_available) = selected_content_disk {
+        Command::new("parted")
+            .arg(&selected_content_disk_available)
+            .arg("mklabel")
+            .arg(format_label)
+            .arg("--script")
+            .output()
+            .expect("failed to execute process");
 
-    Command::new("parted")
-        .arg(selected_content_disk)
-        .arg("mkpart")
-        .arg("primary")
-        .arg("ext4")
-        .arg("0%")
-        .arg("100%")
-        .arg("--script")
-        .spawn()
-        .expect("failed to execute process");
+        Command::new("parted")
+            .arg(&selected_content_disk_available)
+            .arg("mkpart")
+            .arg("primary")
+            .arg("ext4")
+            .arg("0%")
+            .arg("100%")
+            .arg("--script")
+            .spawn()
+            .expect("failed to execute process");
+    }
 
     let mut part_boot = Command::new("parted")
         .arg(selected_disk)
@@ -98,7 +100,7 @@ pub async fn mkfs_formating(
     selected_swap: &str,
     selected_root: &str,
     format_label: &str,
-    selected_content_disk: &str,
+    selected_content_disk: Option<&str>,
 ) {
     let mut make_boot = if format_label == "msdos" {
         Command::new("mkfs.ext4")
@@ -116,11 +118,13 @@ pub async fn mkfs_formating(
 
     manage_status("Formating Partitions", 500, &mut make_boot, 10, false).await;
 
-    Command::new("mkfs.ext4")
-        .arg("-F")
-        .arg(format!("{}1", selected_content_disk))
-        .output()
-        .expect("failed to execute process");
+    if let Some(selected_content_disk_available) = selected_content_disk {
+        Command::new("mkfs.ext4")
+            .arg("-F")
+            .arg(format!("{}1", selected_content_disk_available))
+            .output()
+            .expect("failed to execute process");
+    }
 
     let mut make_swap = Command::new("mkswap")
         .arg(selected_swap)
@@ -141,7 +145,7 @@ pub async fn mkfs_formating(
 pub fn mount_boot_swap_contentdisk(
     system: &str,
     selected_swap: &str,
-    selected_content_disk: &str,
+    selected_content_disk: &Option<&str>,
     selected_disk: Option<&str>,
     selected_boot: &str,
 ) {
@@ -172,11 +176,13 @@ pub fn mount_boot_swap_contentdisk(
 
     std::fs::create_dir("/mnt/kmp").unwrap_or(());
 
-    Command::new("mount")
-        .arg(format!("{}1", selected_content_disk))
-        .arg("/mnt/kmp")
-        .output()
-        .unwrap();
+    if let Some(selected_content_disk_available) = selected_content_disk {
+        Command::new("mount")
+            .arg(format!("{}1", selected_content_disk_available))
+            .arg("/mnt/kmp")
+            .output()
+            .unwrap();
+    }
 
     Command::new("swapon").arg(selected_swap).output().unwrap();
 }

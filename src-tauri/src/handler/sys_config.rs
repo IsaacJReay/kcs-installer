@@ -1,5 +1,5 @@
 use super::{
-    download_data, get_value_mutex_safe, id_system, manage_status, partitions_mgmt, post_install,
+    data_ops, get_value_mutex_safe, id_system, manage_status, partitions_mgmt, post_install,
     sys_info, Command,
 };
 
@@ -10,7 +10,11 @@ pub async fn start_installation() {
         let findram = sys_info::findram(None);
         let system = id_system::id_system();
         let selected_disk: String = get_value_mutex_safe("SELECTED_DISK");
-        let selected_content_disk: String = get_value_mutex_safe("SELECTED_CONTENT_DISK");
+        let selected_content_disk = get_value_mutex_safe("SELECTED_CONTENT_DISK");
+        let selected_content_disk: Option<&str> = {
+            let tmp = !selected_content_disk.is_empty();
+            tmp.then_some(&selected_content_disk)
+        };
 
         let (format_label, boot_label) = match system == "UEFI" {
             true => ("gpt", "fat32"),
@@ -37,7 +41,7 @@ pub async fn start_installation() {
             selected_swap,
             selected_root,
             format_label,
-            &selected_content_disk,
+            selected_content_disk,
         )
         .await;
 
@@ -59,8 +63,8 @@ pub async fn start_installation() {
 
         self::partitions_mgmt::prepare_boot();
         self::post_install::prepare_source(&system, &selected_disk);
-        self::post_install::post_installation().await;
-        self::download_data::download_data().await;
+        self::post_install::post_installation(&selected_content_disk).await;
+        self::data_ops::copy_data().await;
     });
 }
 
@@ -86,7 +90,7 @@ pub fn disable_sleep(state: bool) {
     Command::new("systemctl")
         .arg(match state {
             true => "mask",
-            false => "unmask"
+            false => "unmask",
         })
         .args(&[
             "sleep.target",

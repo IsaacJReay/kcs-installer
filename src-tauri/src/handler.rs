@@ -1,7 +1,7 @@
 mod id_system;
 mod partitions_mgmt;
 mod post_install;
-mod download_data;
+mod data_ops;
 pub mod sys_info;
 pub mod sys_config;
 
@@ -55,16 +55,16 @@ impl DisksInfo {
 }
 
 #[derive(Clone, serde::Deserialize)]
-pub struct DiskandIPArgs {
+pub struct DisksArgs {
     selected_disk: String,
-    selected_content_disk: String,
+    selected_content_disk: Option<String>,
 }
 
-impl DiskandIPArgs {
+impl DisksArgs {
     pub fn get_selected_disk(&self) -> String {
         self.selected_disk.to_owned()
     }
-    pub fn get_selected_content_disk(&self) -> String {
+    pub fn get_selected_content_disk(&self) -> Option<String> {
         self.selected_content_disk.to_owned()
     }
 }
@@ -76,9 +76,24 @@ pub fn reboot() {
 }
 
 #[tauri::command]
-pub fn set_disk_and_ip(args: DiskandIPArgs) {
+pub fn set_main_disks(args: DisksArgs) {
     set_value_mutex_safe("SELECTED_DISK", args.get_selected_disk());
-    set_value_mutex_safe("SELECTED_CONTENT_DISK", args.get_selected_content_disk());
+
+    // match args.get_selected_content_disk() {
+    //     Some(storage_dev) => set_value_mutex_safe("SELECTED_CONTENT_DISK", storage_dev),
+    //     None => set_value_mutex_safe("SELECTED_CONTENT_DISK", String::new())
+    // }
+
+    if let Some(storage_dev) = args.get_selected_content_disk() {
+        set_value_mutex_safe("SELECTED_CONTENT_DISK", storage_dev)
+    }
+
+}
+
+#[tauri::command]
+pub fn set_data_disks(selected_data_disk: String) {
+    set_value_mutex_safe("SELECTED_DATA_DISK", selected_data_disk)
+
 }
 
 #[tauri::command]

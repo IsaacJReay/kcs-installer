@@ -36,7 +36,7 @@ pub fn prepare_source(system: &str, selected_disk: &str) {
     file.write(new.as_bytes()).unwrap();
 }
 
-pub async fn post_installation() {
+pub async fn post_installation(selected_content_disk: &Option<&str>) {
     Command::new("cp")
         .arg("/root/installerpart2.sh")
         .arg("/mnt")
@@ -66,15 +66,6 @@ pub async fn post_installation() {
         .spawn()
         .unwrap();
 
-    manage_status(
-        "Performing Post-Installation",
-        1000,
-        &mut post_install_process,
-        49,
-        true,
-    )
-    .await;
-
     // Cleanup install trash
     Command::new("rm")
         .arg("-f")
@@ -86,4 +77,17 @@ pub async fn post_installation() {
         .arg("/mnt/etc/systemd/network/20-wwan.network")
         .output()
         .unwrap();
+
+    manage_status(
+        "Performing Post-Installation",
+        1000,
+        &mut post_install_process,
+        match selected_content_disk.is_none() {
+            true => 100,
+            false => 49,
+        },
+        true,
+    )
+    .await;
+
 }
