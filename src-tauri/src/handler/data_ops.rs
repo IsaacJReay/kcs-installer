@@ -20,21 +20,21 @@ pub async fn copy_data() {
 
         Command::new("rsync")
             .arg("-avP")
-            .arg("/mnt/kmp/services/")
+            .arg("/mnt/mnt/services/")
             .arg("/mnt/etc/systemd/system/")
             .output()
             .unwrap();
 
         Command::new("rsync")
             .arg("-avP")
-            .arg("/mnt/kmp/bind/conf/")
+            .arg("/mnt/mnt/bind/conf/")
             .arg("/mnt/etc")
             .output()
             .unwrap();
 
         Command::new("rsync")
             .arg("-avP")
-            .arg("/mnt/kmp/bind/zones/")
+            .arg("/mnt/mnt/bind/zones/")
             .arg("/mnt/var/named")
             .output()
             .unwrap();
@@ -54,5 +54,6 @@ pub async fn copy_data() {
             true,
         )
         .await;
+
     }
 }
